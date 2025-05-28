@@ -1,35 +1,40 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [quote, setQuote] = useState("");
+  const [author, setAuthor] = useState("");
+  const [category, setCategory] = useState("");
 
+  async function fetchQuote() {
+    const url = "https://api.api-ninjas.com/v1/quotes";
+    const headers = new Headers();
+    headers.append("X-Api-Key", "h2btFMfjU5KOT10d5MWlrQ==ytmHdQpSJi4Bpqzb");
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: headers,
+      });
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+      const json = await response.json();
+      const firstQuote = json[0];
+      setQuote(firstQuote.quote);
+      setAuthor(firstQuote.author);
+      setCategory(firstQuote.category);
+      console.log(json);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  }
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      <button onClick={() => fetchQuote()}>Fetch Quote</button>
+      <p>{quote}</p>
+      <p> - {author}</p>
+      <p>Category: {category}</p>
+    </div>
+  );
 }
 
-export default App
+export default App;
