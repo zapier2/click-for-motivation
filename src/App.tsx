@@ -1,38 +1,47 @@
 import { useState, useEffect } from "react";
-
+import "./App.css";
 function App() {
   const [quote, setQuote] = useState("");
   const [author, setAuthor] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [category, setCategory] = useState("");
-
   async function fetchQuote() {
-    const url = "https://api.api-ninjas.com/v1/quotes";
-    const headers = new Headers();
-    headers.append("X-Api-Key", "h2btFMfjU5KOT10d5MWlrQ==ytmHdQpSJi4Bpqzb");
+    let url = "https://quoteslate.vercel.app/api/quotes/random";
+    if (category) {
+      url += `?tags=${category}`;
+    }
+    // const headers = new Headers();
+    // headers.append("X-Api-Key", import.meta.env.VITE_API_KEY);
     try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: headers,
-      });
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
       const json = await response.json();
-      const firstQuote = json[0];
-      setQuote(firstQuote.quote);
-      setAuthor(firstQuote.author);
-      setCategory(firstQuote.category);
+      setQuote(json.quote);
+      setAuthor(json.author);
+      setTags(json.tags);
       console.log(json);
     } catch (error: any) {
       console.error(error.message);
     }
   }
+
   return (
     <div>
       <button onClick={() => fetchQuote()}>Fetch Quote</button>
+      <select value={category} onChange={(e) => setCategory(e.target.value)}>
+        <option value="">Random</option>
+        <option value="life">Life</option>
+        <option value="wisdom">Wisdom</option>
+      </select>
       <p>{quote}</p>
       <p> - {author}</p>
-      <p>Category: {category}</p>
+      {tags.map((tag) => (
+        <p key={tag} style={{ marginRight: "8px" }}>
+          #{tag}
+        </p>
+      ))}
     </div>
   );
 }
